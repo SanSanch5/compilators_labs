@@ -36,8 +36,33 @@ class Node:
                 result = self.right.mark_positions(left_pos)
             return result
 
+    def calculate_nullable(self):
+        if self.pos is not None:
+            self.nullable = False
+        elif self.node_type == NodeType.Star:
+            self.nullable = True
+            self.left.calculate_nullable()
+        else:
+            self.left.calculate_nullable()
+            self.right.calculate_nullable()
+            if self.node_type == NodeType.Or:
+                self.nullable = self.left.nullable or self.right.nullable
+            elif self.node_type == NodeType.Cat:
+                self.nullable = self.left.nullable and self.right.nullable
+            else:
+                assert False, "Smth went wrong..."
+
+    def calculate_firstpos(self):
+        pass
+
+    def calculate_followpos(self):
+        pass
+
     def calculate_functions(self):
         self.mark_positions(0)
+        self.calculate_nullable()
+        self.calculate_firstpos()
+        self.calculate_followpos()
 
 
 def token_in_brackets(regexp, i):
