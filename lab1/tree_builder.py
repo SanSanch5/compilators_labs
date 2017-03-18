@@ -40,20 +40,27 @@ class Node:
         if self.pos is not None:
             self.nullable = False
             self.firstpos.append(self.pos)
+            self.lastpos.append(self.pos)
         elif self.node_type == NodeType.Star:
             self.nullable = True
-            self.left.calculate_nullable()
+            self.left.calculate_nullable_firstpos_and_lastpos()
+            self.firstpos = self.left.firstpos
+            self.lastpos = self.left.lastpos
         else:
             self.left.calculate_nullable_firstpos_and_lastpos()
             self.right.calculate_nullable_firstpos_and_lastpos()
             self.firstpos.append(self.left.firstpos)
+            self.lastpos.append(self.right.lastpos)
             if self.node_type == NodeType.Or:
                 self.nullable = self.left.nullable or self.right.nullable
                 self.firstpos.append(self.right.firstpos)
+                self.lastpos.append(self.left.lastpos)
             elif self.node_type == NodeType.Cat:
                 self.nullable = self.left.nullable and self.right.nullable
                 if self.left.nullable:
                     self.firstpos.append(self.right.firstpos)
+                if self.right.nullable:
+                    self.lastpos.append(self.left.lastpos)
             else:
                 assert False, "Smth went wrong..."
 
