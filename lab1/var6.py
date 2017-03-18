@@ -10,3 +10,8 @@ __author__ = 'alex'
 # 3) Моделирует минимальный КА для входной цепочки из терминалов исходной грамматики.
 
 
+from dfa_maker import make_dfa
+
+
+regexp = "(a|b)*abb"
+make_dfa(regexp)

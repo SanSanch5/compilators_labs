@@ -30,20 +30,17 @@ class Node:
 
 def token_in_brackets(regexp, i):
     brackets_counter = 1
-    token = ""
     j = i
-    while not brackets_counter == 0 or j < len(regexp):
+    while brackets_counter != 0 and j < len(regexp):
         j += 1
-        ch = regexp(j)
+        ch = regexp[j]
         if ch == "(":
             brackets_counter += 1
-            token += ch
         elif ch == ")":
             brackets_counter -= 1
-            if not brackets_counter == 0:
-                token += ch
 
-    return token, j
+    assert j != len(regexp), "Incorrect brackets in regexp"
+    return regexp[i+1:j], j
 
 
 # inserts "." as cat operation when needed
@@ -66,7 +63,7 @@ def tokenize(regexp):
                     tokens.append(".")
                 tokens.append(ch)
 
-        is_multiplier = True
+        is_multiplier = ch != "|"
         i += 1
 
     return tokens
@@ -85,6 +82,8 @@ def build_tree(regexp):
                 node.node_type = NodeType.Star
             elif token == "|":
                 node.node_type = NodeType.Or
+            elif token == ".":
+                node.node_type = NodeType.Cat
             else:
                 node.node_type = NodeType.Symbol
 
@@ -94,7 +93,7 @@ def build_tree(regexp):
             root.right = node
             left_set = False
         else:
-            assert node.string in "*|", "Smth gets wrong"
+            assert node.string in "*|.", "Smth gets wrong"
 
             node.left = root
             if not node.node_type == NodeType.Star:
