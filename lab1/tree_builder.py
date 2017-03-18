@@ -22,7 +22,6 @@ class Node:
         self.nullable = None
         self.firstpos = []
         self.lastpos = []
-        self.followpos = []
 
     def mark_positions(self, i):
         if self.string not in "*|.":
@@ -49,28 +48,38 @@ class Node:
         else:
             self.left.calculate_nullable_firstpos_and_lastpos()
             self.right.calculate_nullable_firstpos_and_lastpos()
-            self.firstpos.append(self.left.firstpos)
-            self.lastpos.append(self.right.lastpos)
+            self.firstpos.extend(self.left.firstpos)
+            self.lastpos.extend(self.right.lastpos)
             if self.node_type == NodeType.Or:
                 self.nullable = self.left.nullable or self.right.nullable
-                self.firstpos.append(self.right.firstpos)
-                self.lastpos.append(self.left.lastpos)
+                self.firstpos.extend(self.right.firstpos)
+                self.lastpos.extend(self.left.lastpos)
             elif self.node_type == NodeType.Cat:
                 self.nullable = self.left.nullable and self.right.nullable
                 if self.left.nullable:
-                    self.firstpos.append(self.right.firstpos)
+                    self.firstpos.extend(self.right.firstpos)
                 if self.right.nullable:
-                    self.lastpos.append(self.left.lastpos)
+                    self.lastpos.extend(self.left.lastpos)
             else:
                 assert False, "Smth went wrong..."
 
-    def calculate_followpos(self):
-        pass
+    def followpos(self, i):
+        result = []
+        if self.node_type == NodeType.Cat and i in self.left.lastpos:
+            result = self.right.firstpos
+        elif self.node_type == NodeType.Star and i in self.lastpos:
+            result = self.left.firstpos
+
+        if self.left is not None:
+            result.extend(self.left.followpos(i))
+        if self.right is not None:
+            result.extend(self.right.followpos(i))
+
+        return set(result)
 
     def calculate_functions(self):
         self.mark_positions(0)
         self.calculate_nullable_firstpos_and_lastpos()
-        self.calculate_followpos()
 
 
 def token_in_brackets(regexp, i):
