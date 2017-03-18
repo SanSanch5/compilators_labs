@@ -24,8 +24,20 @@ class Node:
         self.lastpos = []
         self.followpos = []
 
+    def mark_positions(self, i):
+        if self.string not in "*|.":
+            self.pos = i+1
+            return self.pos
+        else:
+            left_pos = self.left.mark_positions(i)
+            if self.string == "*":
+                result = left_pos
+            else:
+                result = self.right.mark_positions(left_pos)
+            return result
+
     def calculate_functions(self):
-        pass
+        self.mark_positions(0)
 
 
 def token_in_brackets(regexp, i):
