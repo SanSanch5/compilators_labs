@@ -14,4 +14,9 @@ from dfa_maker import make_dfa
 
 
 regexp = "(a|b)*abb"
-make_dfa(regexp)
+alphabet, start, states, transform_table, finite = make_dfa(regexp)
+print('Alphabet: ', alphabet)
+print('Start', start)
+print('States', states)
+print('Transformation table', transform_table)
+print('Finite states', finite)
