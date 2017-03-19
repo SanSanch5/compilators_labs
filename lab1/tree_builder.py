@@ -9,6 +9,10 @@ class NodeType:
     Or = 4
 
 
+PosToSymbolMap = dict()
+FollowposMap = dict()
+
+
 class Node:
     def __init__(self):
         self.string = ""
@@ -26,6 +30,7 @@ class Node:
     def mark_positions(self, i):
         if self.string not in "*|.":
             self.pos = i+1
+            PosToSymbolMap[self.pos] = self.string
             return self.pos
         else:
             left_pos = self.left.mark_positions(i)
@@ -80,6 +85,8 @@ class Node:
     def calculate_functions(self):
         self.mark_positions(0)
         self.calculate_nullable_firstpos_and_lastpos()
+        for key in PosToSymbolMap.keys():
+            FollowposMap[key] = self.followpos(key)
 
 
 def token_in_brackets(regexp, i):
@@ -123,6 +130,7 @@ def tokenize(regexp):
     return tokens
 
 
+# не учитывается приоритет операций, только скобки
 def build_tree(regexp):
     root = None
     left_set = False
