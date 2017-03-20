@@ -22,3 +22,5 @@ print('Start', dfa.start_state)
 print('States', dfa.states)
 print('Transformation table', dfa.transformation_table)
 print('Finite states', dfa.finite_states)
+
+dfa.minimize()
