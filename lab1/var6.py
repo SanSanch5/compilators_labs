@@ -10,13 +10,15 @@ __author__ = 'alex'
 # 3) Моделирует минимальный КА для входной цепочки из терминалов исходной грамматики.
 
 
-from dfa_maker import make_dfa
+from dfa import DFA
 
 
 regexp = "(a|b)*abb"
-alphabet, start, states, transform_table, finite = make_dfa(regexp)
-print('Alphabet: ', alphabet)
-print('Start', start)
-print('States', states)
-print('Transformation table', transform_table)
-print('Finite states', finite)
+dfa = DFA()
+dfa.make(regexp)
+print('DFA:')
+print('Alphabet: ', dfa.alphabet)
+print('Start', dfa.start_state)
+print('States', dfa.states)
+print('Transformation table', dfa.transformation_table)
+print('Finite states', dfa.finite_states)
