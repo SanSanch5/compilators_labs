@@ -13,7 +13,9 @@ __author__ = 'alex'
 from dfa import DFA
 
 
-regexp = "(a|b)*abb"
+# regexp = "(a|b)*abb"
+regexp = 'abaacabd'
+
 dfa = DFA()
 dfa.make(regexp)
 print('DFA:')
@@ -24,3 +26,4 @@ print('Transformation table', dfa.transformation_table)
 print('Finite states', dfa.finite_states)
 
 dfa.minimize()
+print('Minimized states', dfa.minimized_states)
