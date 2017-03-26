@@ -13,12 +13,12 @@ __author__ = 'alex'
 from dfa import DFA
 
 
-# regexp = "(a|b)*abb"
-regexp = 'abaacabd'
+regexp = "(a|b)*abb"
+# regexp = 'abaacabd'
 
 dfa = DFA()
 dfa.make(regexp)
-print('DFA:')
+print('DFA of "%s":' % regexp)
 print('Alphabet: ', dfa.alphabet)
 print('Start', dfa.start_state)
 print('States', dfa.states)
