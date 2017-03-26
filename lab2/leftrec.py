@@ -12,11 +12,10 @@
 
 
 import sys
-
 import grammar_io
 
 
-def remove_left_recursion(grammar):
+def eliminate_left_recursion(grammar):
     nts = sorted(grammar)
     for A_i in nts:
         for A_j in nts:
@@ -49,6 +48,6 @@ grammar_io.write(grammar, sys.stdout)
 print()
 
 print('Without left recursion:')
-grammar_io.write(remove_left_recursion(grammar), sys.stdout)
+grammar_io.write(eliminate_left_recursion(grammar), sys.stdout)
 print()
 
