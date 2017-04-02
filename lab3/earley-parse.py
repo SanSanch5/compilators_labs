@@ -75,21 +75,16 @@ def earley_parse(G, initial, w):
 
     for k in range(0, len(w)):
         i = 0
-        finished_state = False
         while i < len(I[k]):
             state = list(I[k])[i]
-            if not finished_state:
+            if not finished(state):
                 if next_element(state) in nts:
                     predictor(state, k, G, I, log, i)
                 else:
                     scanner(state, k, w, I, log)
             else:
                 completer(state, k, I, log, i)
-
-            if i + 1 == len(I[k]):
-                finished_state = True
-            else:
-                i += 1
+            i += 1
 
     return I, log
 
