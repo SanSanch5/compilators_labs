@@ -26,13 +26,13 @@ def next_element(state):
     return production[production.index(dot) + 1]
 
 
-def predictor(state, k, G, I, log):
+def predictor(state, k, G, I, log, i):
     B = next_element(state)
     for production in G[B]:
         new_prod = list(production)
         new_prod.insert(0, dot)
         I[k].add(((B, tuple(new_prod)), k))
-        log.append('predict')
+        log.append('predict from (%i)' % i)
 
 
 def scanner(state, k, words, I, log):
@@ -44,10 +44,10 @@ def scanner(state, k, words, I, log):
         del new_prod[ind]
         new_prod.insert(ind+1, dot)
         I[k+1].add(((A, tuple(new_prod)), j))
-        log.append('scan')
+        log.append('scan from S(%i)(%i)' % (k, list(I[k]).index(state)))
 
 
-def completer(state, k, I, log):
+def completer(state, k, I, log, i):
     # procedure COMPLETER((B → γ•, x), k)
     # for each (A → α•Bβ, j) in S[x] do
     #     ADD-TO-SET((A → αB•β, j), S[k])
@@ -61,7 +61,7 @@ def completer(state, k, I, log):
             del new_prod[ind]
             new_prod.insert(ind+1, dot)
             I[k].add(((A, tuple(new_prod)), j))
-            log.append('complete')
+            log.append('complete from (%i) and S(?)(?)' % i)
 
 
 def earley_parse(G, initial, w):
@@ -74,14 +74,22 @@ def earley_parse(G, initial, w):
     log.append('start rule')
 
     for k in range(0, len(w)):
-        for state in I[k]:
-            if not finished(state):
+        i = 0
+        finished_state = False
+        while i < len(I[k]):
+            state = list(I[k])[i]
+            if not finished_state:
                 if next_element(state) in nts:
-                    predictor(state, k, G, I, log)
+                    predictor(state, k, G, I, log, i)
                 else:
                     scanner(state, k, w, I, log)
             else:
-                completer(state, k, I, log)
+                completer(state, k, I, log, i)
+            i += 1
+            if i + 1 == len(I[k]):
+                finished_state = True
+            else:
+                i += 1
 
     return I, log
 
