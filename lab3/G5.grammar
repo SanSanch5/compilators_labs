@@ -1,0 +1,35 @@
+expr -> rel log-op rel
+expr -> rel
+rel -> simple-expr rel-op simple-expr
+rel -> simple-expr
+simple-expr -> un-add-op term bin-add-op term
+simple-expr -> term bin-add-op term
+simple-expr -> un-add-op term
+simple-expr -> term
+term -> factor mul-op factor
+term -> factor
+factor -> prim ** prim
+factor -> abs prim
+factor -> not prim
+factor -> prim
+prim -> 0
+prim -> x
+prim -> ( expr )
+log-op -> and
+log-op -> or
+log-op -> xor
+rel-op -> <
+rel-op -> <=
+rel-op -> =
+rel-op -> />
+rel-op -> >
+rel-op -> >=
+bin-add-op -> +
+bin-add-op -> -
+bin-add-op -> &
+un-add-op -> +
+un-add-op -> -
+mul-op -> *
+mul-op -> /
+mul-op -> mod
+mul-op -> rem
