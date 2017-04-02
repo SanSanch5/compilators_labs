@@ -85,7 +85,7 @@ def earley_parse(G, initial, w):
                     scanner(state, k, w, I, log)
             else:
                 completer(state, k, I, log, i)
-            i += 1
+
             if i + 1 == len(I[k]):
                 finished_state = True
             else:
