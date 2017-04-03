@@ -121,4 +121,11 @@ for line in sys.stdin:
         continue
 
     # print result
-    print(result, log)
+    for k, items in enumerate(result):
+        input_with_dot = w.copy()
+        input_with_dot.insert(k, dot)
+        print("S(%i): " % k, ' '.join(input_with_dot))
+        for j, item in enumerate(items):
+            (nt, prod), x = item
+            print(("\t(%i)" % j).ljust(5), "%s -> %s" % (nt.rjust(10), ' '.join(prod).ljust(20)), ("(%i)" % x).ljust(5),
+                  " # %s" % log.pop(0))
