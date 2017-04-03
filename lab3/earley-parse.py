@@ -13,7 +13,7 @@ extra_state = 'S`'
 
 
 def init(words):
-    return [set() for _ in words]
+    return [[] for _ in range(0, len(words) + 1)]
 
 
 def finished(state):
@@ -31,7 +31,9 @@ def predictor(state, k, G, I, log, i):
     for production in G[B]:
         new_prod = list(production)
         new_prod.insert(0, dot)
-        I[k].add(((B, tuple(new_prod)), k))
+        new_state = ((B, tuple(new_prod)), k)
+        if new_state not in I[k]:
+            I[k].append(new_state)
         log.append('predict from (%i)' % i)
 
 
@@ -43,8 +45,14 @@ def scanner(state, k, words, I, log):
         new_prod = list(production)
         del new_prod[ind]
         new_prod.insert(ind+1, dot)
-        I[k+1].add(((A, tuple(new_prod)), j))
+        new_state = ((A, tuple(new_prod)), j)
+        if new_state not in I[k+1]:
+            I[k+1].append(new_state)
         log.append('scan from S(%i)(%i)' % (k, list(I[k]).index(state)))
+
+
+def contains(subseq, inseq):
+    return any(inseq[pos:pos + len(subseq)] == subseq for pos in range(0, len(inseq) - len(subseq) + 1))
 
 
 def completer(state, k, I, log, i):
@@ -53,15 +61,19 @@ def completer(state, k, I, log, i):
     #     ADD-TO-SET((A → αB•β, j), S[k])
     # end
     (B, _), x = state
-    for item in S[x]:
+    for item in I[x]:
         (A, prod), j = item
-        if (dot, B) in prod:
+        if contains([dot, B], list(prod)):
             ind = prod.index(dot)
             new_prod = list(prod)
             del new_prod[ind]
             new_prod.insert(ind+1, dot)
-            I[k].add(((A, tuple(new_prod)), j))
-            log.append('complete from (%i) and S(?)(?)' % i)
+            new_state = ((A, tuple(new_prod)), j)
+            if new_state not in I[k]:
+                I[k].append(new_state)
+
+            # maybe error in calculating indexes for log
+            log.append('complete from (%i) and S(%i)(%i)' % (i, x, list(I[x]).index(item)))
 
 
 def earley_parse(G, initial, w):
@@ -70,17 +82,17 @@ def earley_parse(G, initial, w):
 
     I = init(w)
 
-    I[0].add(((extra_state, (dot, initial)), 0))
+    I[0].append(((extra_state, (dot, initial)), 0))
     log.append('start rule')
 
-    for k in range(0, len(w)):
+    for k in range(0, len(w) + 1):
         i = 0
         while i < len(I[k]):
             state = list(I[k])[i]
             if not finished(state):
                 if next_element(state) in nts:
                     predictor(state, k, G, I, log, i)
-                else:
+                elif k < len(w):
                     scanner(state, k, w, I, log)
             else:
                 completer(state, k, I, log, i)
@@ -89,7 +101,7 @@ def earley_parse(G, initial, w):
     return I, log
 
 
-file = "example2.grammar"
+file = "example1.grammar"
 with open(file) as grammar:
     G, initial = read(grammar)
 
@@ -109,3 +121,4 @@ for line in sys.stdin:
         continue
 
     # print result
+    print(result, log)
