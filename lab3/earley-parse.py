@@ -13,7 +13,9 @@ extra_state = 'S`'
 
 
 def init(words):
-    return [[] for _ in range(0, len(words) + 1)]
+    I = [[] for _ in range(0, len(words) + 1)]
+    log = [[] for _ in range(0, len(words) + 1)]
+    return I, log
 
 
 def finished(state):
@@ -34,7 +36,7 @@ def predictor(state, k, G, I, log, i):
         new_state = ((B, tuple(new_prod)), k)
         if new_state not in I[k]:
             I[k].append(new_state)
-        log.append('predict from (%i)' % i)
+        log[k].append('predict from (%i)' % i)
 
 
 def scanner(state, k, words, I, log):
@@ -48,7 +50,7 @@ def scanner(state, k, words, I, log):
         new_state = ((A, tuple(new_prod)), j)
         if new_state not in I[k+1]:
             I[k+1].append(new_state)
-        log.append('scan from S(%i)(%i)' % (k, list(I[k]).index(state)))
+        log[k+1].append('scan from S(%i)(%i)' % (k, list(I[k]).index(state)))
 
 
 def contains(subseq, inseq):
@@ -73,14 +75,13 @@ def completer(state, k, I, log, i):
                 I[k].append(new_state)
 
             # maybe error in calculating indexes for log
-            log.append('complete from (%i) and S(%i)(%i)' % (i, x, list(I[x]).index(item)))
+            log[k].append('complete from (%i) and S(%i)(%i)' % (i, x, list(I[x]).index(item)))
 
 
 def earley_parse(G, initial, w):
-    log = []
     nts = G.keys()
 
-    I = init(w)
+    I, log = init(w)
 
     I[0].append(((extra_state, (dot, initial)), 0))
     log.append('start rule')
@@ -101,7 +102,7 @@ def earley_parse(G, initial, w):
     return I, log
 
 
-file = "example1.grammar"
+file = "G5.grammar"
 with open(file) as grammar:
     G, initial = read(grammar)
 
@@ -128,4 +129,4 @@ for line in sys.stdin:
         for j, item in enumerate(items):
             (nt, prod), x = item
             print(("\t(%i)" % j).ljust(5), "%s -> %s" % (nt.rjust(10), ' '.join(prod).ljust(20)), ("(%i)" % x).ljust(5),
-                  " # %s" % log.pop(0))
+                  " # %s" % log[k][j])
